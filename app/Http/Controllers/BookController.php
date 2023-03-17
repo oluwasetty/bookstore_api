@@ -6,6 +6,7 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 use App\Http\Resources\Resource as BookResource;
 use App\Http\Requests\BookRequest;
+use App\Books\BooksRepository;
 
 class BookController extends Controller
 {
@@ -28,11 +29,11 @@ class BookController extends Controller
      *       )
      *     )
      */
-    public function index()
+    public function index(Request $request)
     {
         // returns all books
-        $books = Book::orderBy('title', 'ASC')->paginate(25);
-        return BookResource::collection($books)->additional(['status' => true])->response()->setStatusCode(200);
+        $books = Book::orderBy('title', 'ASC')->paginate($request->per_page ?? 25);
+        return BookResource::collection($books)->additional(['status' => true]);
     }
 
     /**
@@ -196,19 +197,12 @@ class BookController extends Controller
      *       )
      *     )
      */
-    public function search(Request $request)
+    public function search(Request $request, BooksRepository $book)
     {
-        // returns all books
-        $q = $request->q;
-        $books = Book::query()
-        ->where(fn ($query) => (
-            $query->where('title', 'LIKE', "%{$q}%")
-                ->orWhere('author', 'LIKE', "%{$q}%")
-                ->orWhere('genre', 'LIKE', "%{$q}%")
-                ->orWhere('isbn', 'LIKE', "%{$q}%")
-                ->orWhere('published', 'LIKE', "%{$q}%")
-        ))
-        ->paginate(25);
+        // // returns search results books
+        $books = $request->has('q')
+            ? $book->search($request->q, $request->per_page ?? 25)
+            : Book::orderBy('title', 'ASC')->paginate($request->per_page ?? 25);
         return BookResource::collection($books)->additional(['status' => true])->response()->setStatusCode(200);
     }
 }
