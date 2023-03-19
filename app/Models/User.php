@@ -10,6 +10,14 @@ use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use App\Traits\Uuid;
 
+/**
+ * @OA\Schema(required={"name", "email", "password"}, @OA\Xml(name="User"))
+ * @OA\Property(property="id", type="string", example="c85c9c7c-dbb8-4d62-b1a9-f5585ee208d6")
+ * @OA\Property(property="name", type="string", example="John Doe")
+ * @OA\Property(property="email", type="string", example="johndoe@gmail.com")
+ * @OA\Property(property="password", type="string", example="password")
+ */
+
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, Uuid;

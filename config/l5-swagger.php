@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'My Articles API',
+                'title' => 'Bookstore API',
             ],
 
             'routes' => [

@@ -24,16 +24,25 @@ class BookController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/books",
-     *      operationId="getBooksList",
-     *      tags={"Books"},
-     *      summary="Get list of books",
-     *      description="Returns list of books",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *       )
+     *     path="/books",
+     *     summary="Get books",
+     *     description="Returns list of books",
+     *     operationId="getBooks",
+     *     tags={"Book"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Book")
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
      *     )
+     * )
      */
     public function index(Request $request)
     {
@@ -68,20 +77,38 @@ class BookController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/books",
-     *      operationId="postBook",
-     *      tags={"Books"},
-     *      summary="post a book",
-     *      description="post a book",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Ok",
-     *       ),
-     *      @OA\Response(
-     *          response=201,
-     *          description="Created",
-     *       )
-     *     )
+     *     path="/books",
+     *     tags={"Book"},
+     *     operationId="addBook",
+     *     summary="Add a new book to the store",
+     *     description="",
+     *     @OA\RequestBody(
+     *         description="Book object that needs to be added to the store",
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Book"),
+     *         @OA\MediaType(
+     *             mediaType="application/xml",
+     *             @OA\Schema(ref="#/components/schemas/Book")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Created",
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     security={{"apiAuth": {"write:books", "read:books"}}}
+     * )
      */
     public function store(BookRequest $request)
     {
@@ -106,16 +133,43 @@ class BookController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/books/{id}",
-     *      operationId="getoneBook",
-     *      tags={"Books"},
-     *      summary="get a book",
-     *      description="get a book",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *       )
+     *     path="/books/{bookId}",
+     *     summary="Find book by ID",
+     *     description="Returns a single book",
+     *     operationId="getBookById",
+     *     tags={"Book"},
+     *     @OA\Parameter(
+     *         description="ID of book to return",
+     *         in="path",
+     *         name="bookId",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="c85c9c7c-dbb8-4d62-b1a9-f5585ee208d6"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Book")
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="Book not found"
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
      *     )
+     * )
      */
     public function show($id)
     {
@@ -156,18 +210,54 @@ class BookController extends Controller
 
     /**
      * @OA\Put(
-     *      path="/books/{id}",
-     *      operationId="updateBook",
-     *      tags={"Books"},
-     *      summary="update a book",
-     *      description="update a book",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *       )
-     *     )
+     *     path="/books/{bookId}",
+     *     tags={"Book"},
+     *     operationId="updateBook",
+     *     summary="Update an existing book.",
+     *     description="",
+     *     @OA\Parameter(
+     *         description="ID of book to update",
+     *         in="path",
+     *         name="bookId",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="c85c9c7c-dbb8-4d62-b1a9-f5585ee208d6"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Book object that needs to be added to the store",
+     *         @OA\JsonContent(ref="#/components/schemas/Book"),
+     *         @OA\MediaType(
+     *             mediaType="application/xml",
+     *             @OA\Schema(ref="#/components/schemas/Book"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Book not found",
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     security={{"apiAuth": {"write:books", "read:books"}}}
+     * )
      */
-    public function update(Request $request, $id)
+    public function update(BookRequest $request, $id)
     {
         try {
             // update books
@@ -195,16 +285,47 @@ class BookController extends Controller
 
     /**
      * @OA\Delete(
-     *      path="/books/{id}",
-     *      operationId="deleteBook",
-     *      tags={"Books"},
-     *      summary="delete a book",
-     *      description="delete a book",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *       )
-     *     )
+     *     path="/books/{bookId}",
+     *     summary="Deletes a book",
+     *     description="",
+     *     operationId="deleteBook",
+     *     tags={"Book"},
+     *     @OA\Parameter(
+     *         description="Book id to delete",
+     *         in="path",
+     *         name="bookId",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="c85c9c7c-dbb8-4d62-b1a9-f5585ee208d6"
+     *         )
+     *     ),
+     *     @OA\Header(
+     *         header="api_key",
+     *         description="Api key header",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Book not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     ),
+     *     security={{"apiAuth": {"write:books", "read:books"}}}
+     * )
      */
     public function destroy($id)
     {
@@ -227,16 +348,33 @@ class BookController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/search-books",
-     *      operationId="searchBooks",
-     *      tags={"Books"},
-     *      summary="Search for books",
-     *      description="Returns list of books",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *       )
+     *     path="/search-books",
+     *     summary="Search for books.",
+     *     tags={"Book"},
+     *      description="Returns list of related books",
+     *     operationId="searchBooks",
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         description="Search query",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
      *     )
+     * )
      */
     public function search(Request $request, BooksRepository $book)
     {

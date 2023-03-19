@@ -17,6 +17,41 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
+
+    /**
+     * @OA\Post(path="/login",
+     *     tags={"User"},
+     *     summary="Logs user into the system",
+     *     description="",
+     *     operationId="loginUser",
+     *     @OA\RequestBody(
+     *         description="Book object that needs to be added to the store",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", ref="#/components/schemas/User/properties/email"),
+     *             @OA\Property(property="password", ref="#/components/schemas/User/properties/password"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation",
+     *         @OA\Schema(type="string"),
+     *     ),
+     *     @OA\Response(
+     *         response=405,
+     *         description="Method Not Allowed",
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
     public function login(LoginRequest $request)
     {
         try {
@@ -82,6 +117,17 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(path="/logout",
+     *     tags={"User"},
+     *     summary="Logs out current logged in user session",
+     *     description="",
+     *     operationId="logoutUser",
+     *     parameters={},
+     *     @OA\Response(response="200", description="successful operation"),
+     *     security={{"apiAuth": {"write:books", "read:books"}}}
+     * )
+     */
     public function logout()
     {
         try {
