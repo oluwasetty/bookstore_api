@@ -25,4 +25,13 @@ class Book extends Model
     protected $casts = [
         'published' => 'datetime',
     ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'deleted_at',
+    ];
 }

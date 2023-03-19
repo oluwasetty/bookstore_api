@@ -10,6 +10,12 @@ use App\Books\BooksRepository;
 
 class BookController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['index', 'show', 'search']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -31,9 +37,16 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        // returns all books
-        $books = Book::orderBy('title', 'ASC')->paginate($request->per_page ?? 25);
-        return BookResource::collection($books)->additional(['status' => true]);
+        try {
+            // returns all books
+            $books = Book::orderBy('title', 'ASC')->paginate($request->per_page ?? 25);
+            return BookResource::collection($books)->additional(['status' => true, 'message' => 'List Successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -72,9 +85,16 @@ class BookController extends Controller
      */
     public function store(BookRequest $request)
     {
-        // creates artcles
-        $book = Book::create(array_merge($request->all()));
-        return (new BookResource($book))->additional(['status' => true])->response()->setStatusCode(200);
+        try {
+            // creates books
+            $book = Book::create(array_merge($request->all(), ['image' => 'http://placeimg.com/480/640/any']));
+            return (new BookResource($book))->additional(['status' => true, 'message' => 'Saved Successfully'])->response()->setStatusCode(201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -99,12 +119,19 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        // show one book
-        $book = Book::find($id);
-        if ($book) {
-            return (new BookResource($book))->additional(['status' => true])->response()->setStatusCode(200);
-        } else {
-            return response()->json(['status' => false, 'error' => 'resource could not be found'], 404);
+        try {
+            // show one book
+            $book = Book::find($id);
+            if ($book) {
+                return (new BookResource($book))->additional(['status' => true, 'message' => 'Retrieved Successfully'])->response()->setStatusCode(200);
+            } else {
+                return response()->json(['status' => false, 'message' => 'resource could not be found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -142,13 +169,20 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // update books
-        $book = Book::find($id);
-        if ($book) {
-            $book->update(array_merge($request->all()));
-            return (new BookResource($book))->additional(['status' => true])->response()->setStatusCode(200);
-        } else {
-            return response()->json(['status' => false, 'error' => 'resource could not be found'], 404);
+        try {
+            // update books
+            $book = Book::find($id);
+            if ($book) {
+                $book->update(array_merge($request->all()));
+                return (new BookResource($book))->additional(['status' => true, 'message' => 'Updated Successfully'])->response()->setStatusCode(200);
+            } else {
+                return response()->json(['status' => false, 'message' => 'resource could not be found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -174,13 +208,20 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        // delete book
-        $book = Book::find($id);
-        if ($book) {
-            $book->delete();
-            return (new BookResource($book))->additional(['status' => true])->response()->setStatusCode(200);
-        } else {
-            return response()->json(['status' => false, 'error' => 'resource could not be found'], 404);
+        try {
+            // delete book
+            $book = Book::find($id);
+            if ($book) {
+                $book->delete();
+                return response()->json(['status' => true, 'message' => 'Deleted Successfully'], 200);
+            } else {
+                return response()->json(['status' => false, 'message' => 'resource could not be found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -199,10 +240,17 @@ class BookController extends Controller
      */
     public function search(Request $request, BooksRepository $book)
     {
-        // // returns search results books
-        $books = $request->has('q')
-            ? $book->search($request->q, $request->per_page ?? 25)
-            : Book::orderBy('title', 'ASC')->paginate($request->per_page ?? 25);
-        return BookResource::collection($books)->additional(['status' => true])->response()->setStatusCode(200);
+        try {
+            // // returns search results books
+            $books = $request->has('q')
+                ? $book->search($request->q, $request->per_page ?? 25)
+                : Book::orderBy('title', 'ASC')->paginate($request->per_page ?? 25);
+            return BookResource::collection($books)->additional(['status' => true, 'message' => 'Search Completed'])->response()->setStatusCode(200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

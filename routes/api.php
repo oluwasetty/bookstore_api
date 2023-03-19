@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +20,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::controller(AuthController::class)->group(function () {
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+    Route::post('logout', 'logout');
+    Route::post('refresh', 'refresh');
+});
+
+Route::controller(BookController::class)->group(function () {
+    Route::get('books', 'index');
+    Route::get('books/{id}', 'show');
+    Route::post('books', 'store');
+    Route::put('books/{id}', 'update');
+    Route::delete('books/{id}', 'destroy');
+    Route::get('search-books', 'search');
+});
+
 Route::get('/', function () {
     return "Bookstore API";
 });
-
-// route to books resource
-Route::resource('books', 'BookController');
-
-// route to search for book
-Route::get('/search-books', 'BookController@search');

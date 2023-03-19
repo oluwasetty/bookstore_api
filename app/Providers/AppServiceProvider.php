@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Books;
 use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
+use Elastic\Elasticsearch\Client;
 
 class AppServiceProvider extends ServiceProvider
 {

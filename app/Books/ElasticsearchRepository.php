@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 
 class ElasticsearchRepository implements BooksRepository
 {
-    /** @var \Elasticsearch\Client */
+    /** @var \Elastic\Elasticsearch\Client */
     private $elasticsearch;
 
     public function __construct(Client $elasticsearch)
@@ -33,7 +33,7 @@ class ElasticsearchRepository implements BooksRepository
             'body' => [
                 'query' => [
                     'multi_match' => [
-                        'fields' => ['title^5', 'body', 'tags'],
+                        'fields' => ['title^5', 'Author^3', 'genre^1', 'isbn', 'published'],
                         'query' => $query,
                     ],
                 ],
