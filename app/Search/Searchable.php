@@ -21,11 +21,11 @@ trait Searchable
 
     public function getSearchType()
     {
-        if (property_exists($this, 'useSearchType')) {
-            return $this->useSearchType;
-        }
+        // if (property_exists($this, 'useSearchType')) {
+        //     return $this->useSearchType;
+        // }
 
-        return $this->getTable();
+        return '_doc';
     }
 
     public function toSearchArray()

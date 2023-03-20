@@ -48,6 +48,7 @@ class ReindexCommand extends Command
 
         foreach (Book::cursor() as $book)
         {
+            
             $this->elasticsearch->index([
                 'index' => $book->getSearchIndex(),
                 'type' => $book->getSearchType(),

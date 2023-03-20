@@ -33,7 +33,7 @@ class ElasticsearchRepository implements BooksRepository
             'body' => [
                 'query' => [
                     'multi_match' => [
-                        'fields' => ['title^5', 'Author^3', 'genre^1', 'isbn', 'published'],
+                        'fields' => ['title^5', 'Author^3', 'genre^1', 'isbn', 'publisher', 'published'],
                         'query' => $query,
                     ],
                 ],

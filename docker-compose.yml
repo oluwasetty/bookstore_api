@@ -47,22 +47,71 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
-    elasticsearch:
+    es01:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+        container_name: es01
         environment:
-            - discovery.type=single-node
+            - node.name=es01
+            - cluster.name=es-docker-cluster
+            - discovery.seed_hosts=es02,es03
+            - cluster.initial_master_nodes=es01,es02,es03
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - elasticdata01:/usr/share/elasticsearch/data
         ports:
             - 9200:9200
-            - 9300:9300
-        volumes:
-            - sailelasticsearch:/usr/share/elasticsearch/data
         networks:
-            - sail 
+            - sail
+    es02:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+        container_name: es02
+        environment:
+        - node.name=es02
+        - cluster.name=es-docker-cluster
+        - discovery.seed_hosts=es01,es03
+        - cluster.initial_master_nodes=es01,es02,es03
+        - bootstrap.memory_lock=true
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+        - elasticdata02:/usr/share/elasticsearch/data
+        networks:
+        - sail
+    es03:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+        container_name: es03
+        environment:
+        - node.name=es03
+        - cluster.name=es-docker-cluster
+        - discovery.seed_hosts=es01,es02
+        - cluster.initial_master_nodes=es01,es02,es03
+        - bootstrap.memory_lock=true
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+        - elasticdata03:/usr/share/elasticsearch/data
+        networks:
+        - sail
 networks:
     sail:
         driver: bridge
 volumes:
     sail-mysql:
         driver: local
-    sailelasticsearch:
+    elasticdata01:
+        driver: local
+    elasticdata02:
+        driver: local
+    elasticdata03:
         driver: local
