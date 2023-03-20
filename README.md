@@ -13,7 +13,7 @@ N.B Make sure you have docker running on your system
 8) Run ./vendor/bin/sail artisan search:reindex to reindex elastic search if need be
 
 # For implementation on local machine
-N.B Make sure you have an instance Elastic search client running on your system
+N.B Make sure you have an instance of Elastic search client running on your system
 1) Run git clone `link to repository` 
 2) Run cp .env.example .env  
 3) Run composer install
